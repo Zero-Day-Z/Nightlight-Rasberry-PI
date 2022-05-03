@@ -1,6 +1,35 @@
 import RPi.GPIO as GPIO
 import time
 from ADCDevice import *
+import smtplib
+
+#Initialize Email
+SMTP_SERVER = 'smtp.gmail.com' #Email Server (don't change!)
+SMTP_PORT = 587 #Server Port (don't change!)
+GMAIL_USERNAME = #email
+GMAIL_PASSWORD = #password
+
+#Email CLass
+class Emailer:
+    def sendmail(self, recipient,  subject, content):
+        #Creating the headers
+        headers = ["From: " + GMAIL_USERNAME, "Subject: " +subject, 
+            "To: " + recipient, "MIME-Version 1.0", "Content-Type: text/html"]
+        headers = "\r\n".join(headers)
+
+        #Connect to Gmail Server
+        session = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        session.ehlo()
+        session.starttls()
+        session.ehlo()
+
+        #Login to Gmail
+        session.login(GMAIL_USERNAME, GMAIL_PASSWORD)
+
+        #Send Email & Exit
+        session.sendmail(GMAIL_USERNAME, recipient, headers + "\r\n\r\n" + content)
+        session.quit
+
 ledPin = 11 # define ledPin
 adc = ADCDevice() # Define an ADCDevice class object
 def setup():
@@ -30,6 +59,11 @@ def loop():
         print ('ADC Value : %d, Voltage : %.2f'%(value,voltage))
         if voltage >= 2.0:
             print("Nightlight on!")
+            sender = Emailer()
+            sendTo = #recipient email
+            emailSubject = "IOT Research: Nightlight "
+            emailContent = "This is the Pi in the lab.\n The nightlight has been turned on!"
+            sender.sendmail(sendTo, emailSubject, emailContent)
         time.sleep(1)
 def destroy():
     adc.close()
